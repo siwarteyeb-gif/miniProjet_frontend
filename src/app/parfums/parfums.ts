@@ -11,20 +11,30 @@ import { Auth } from '../services/auth';
   templateUrl: './parfums.html'
 })
 export class Parfums implements OnInit {
-  parfums : Parfum[];
+  parfums! : Parfum[];
 
   constructor(private parfumService:ParfumService,
     public authService: Auth
   ) { 
-    this.parfums=this.parfumService.listeParfum();
+    //this.parfums=this.parfumService.listeParfum();
    }
-ngOnInit():void{
-
-}
-supprimerParfum(parf:Parfum){
-  
-  let conf=confirm("Etes-vous sur?");
-  if(conf){
-  this.parfumService.supprimerParfum(parf);}
-}
+   
+  ngOnInit(): void { 
+    this.chargerParfums(); 
+  } 
+  chargerParfums(){ 
+    this.parfumService.listeParfum().subscribe(prods => { 
+      console.log(prods); 
+      this.parfums = prods; 
+    });  
+  }
+ supprimerParfum(p: Parfum) 
+    { 
+      let conf = confirm("Etes-vous sûr ?"); 
+      if (conf) 
+      this.parfumService.supprimerParfum(p.idParfum!).subscribe(() => { 
+        console.log("produit supprimé"); 
+        this.chargerParfums(); 
+           }); 
+    }  
 }

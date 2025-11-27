@@ -25,26 +25,22 @@ export class UpdateParfum implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Charger la liste des genres
-    this.genres = this.parfumService.listeGenres();
+this.parfumService.listeGenres().
+subscribe(gens => {console.log(gens);
+this.genres = gens._embedded.genres;
+}
+);
+this.parfumService.consulterParfum(this.activatedRoute.snapshot.params['id']).
+subscribe( prod =>{ this.currentParfum = prod;
+this.updatedGenId = this.currentParfum.genre.idGen;
+} ) ;
+}
 
-    // Charger le parfum à modifier
-    this.currentParfum = this.parfumService.consulterParfum(
-      this.activatedRoute.snapshot.params['id']
-    );
-
-    // Initialiser l'id du genre sélectionné
-    this.updatedGenId = this.currentParfum.genre.idGen;
-  }
-
-  updateParfum() {
-    // Mettre à jour le genre du parfum
-    this.currentParfum.genre = this.parfumService.consulterGenre(this.updatedGenId);
-
-    
-    this.parfumService.updateParfum(this.currentParfum);
-
- 
-    this.router.navigate(['parfums']); // ou [''] si ton home est vide
-  }
+ updateParfum() { 
+this.currentParfum.genre = this.genres. 
+find(cat => cat.idGen == this.updatedGenId)!; 
+this.parfumService.updateParfum(this.currentParfum).subscribe(prod => { 
+this.router.navigate(['parfums']); } 
+); 
+} 
 }

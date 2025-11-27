@@ -99,25 +99,25 @@
     </div>
 
 
-    <div class="col-sm-4 col-md-4 col-lg-4 mb-3">
+     <div class="col-sm-4 col-md-4 col-lg-4 mb-3">
       <label>Genre</label>
       <select class="form-control" formControlName="idGen">
         <option value="">-- Sélectionnez un genre --</option>
         @for (gen of genres; track gen.idGen) {
           <option [value]="gen.idGen">{{ gen.nomGen }}</option>
         }
-      </select>
-      @if (parfumForm.controls['idGen'].hasError('required') && parfumForm.controls['idGen'].touched) {
+      </select> 
+     @if (parfumForm.controls['idGen'].hasError('required') && parfumForm.controls['idGen'].touched) {
         <small class="text-danger">⚠️ Ce champ est obligatoire</small>
-      }
-    </div>
+      } 
+    </div> 
 
-    @if (loading) {
+     @if (loading) {
       <div class="d-flex justify-content-center">
         <div class="spinner-border" role="status"></div>
       </div>
     }
-
+ 
     <div class="mt-3">
       <button
         type="button"

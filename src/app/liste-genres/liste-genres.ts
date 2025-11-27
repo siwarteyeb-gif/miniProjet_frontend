@@ -19,47 +19,44 @@ export class ListeGenres implements OnInit {
   constructor(private parfumService: ParfumService) {}
 
   ngOnInit(): void {
-    this.genres = this.parfumService.listeGenres();
-    console.log(this.genres);
-  }
+  this.parfumService.listeGenres()
+    .subscribe(gens => {
+      this.genres = gens._embedded.genres; console.log(gens); });
+      
+   
+}
 
-  chargerGenres() {
-    this.genres = this.parfumService.listeGenres();
-    console.log(this.genres);
-  }
-
-  // -----------------------
-  //  ID AUTO-INCREMENT
-  // -----------------------
+chargerGenres() {
+  this.parfumService.listeGenres()
+    .subscribe(gens =>
+       {this.genres = gens._embedded.genres; console.log(gens); }); }
+   
+   
   getNewId(): number {
     if (this.genres.length === 0) return 1;
     const maxId = Math.max(...this.genres.map(g => g.idGen));
     return maxId + 1;
   }
-
-  // -----------------------
-  //  UPDATE BUTTON
-  // -----------------------
+    
   updateGen(gen: Genre) {
-    this.updatedGen = { ...gen };  // *** important ***
+    this.updatedGen = { ...gen };
     this.ajout = false;
   }
 
-  // -----------------------
-  //  SAVE (ADD OR UPDATE)
-  // -----------------------
+ 
+   
   genreUpdated(gen: Genre) {
-    if (this.ajout) {
-      gen.idGen = this.getNewId();
-      this.parfumService.ajouterGenre(gen);
-    } else {
-      this.parfumService.ajouterGenre(gen);
-    }
+  if (this.ajout) {
+    gen.idGen = this.getNewId();
+    this.parfumService.ajouterGenre(gen);
+  } else {
 
-    this.chargerGenres();
-    this.ajout = true;
-
-    // IMPORTANT → reset object
-    this.updatedGen = { idGen: 0, nomGen: "" };
+    gen.idGen = this.updatedGen.idGen;
+    this.parfumService.updateGenre(gen);
   }
+
+  this.chargerGenres();
+  this.ajout = true;
+  this.updatedGen = { idGen: 0, nomGen: "" };
+}
 }

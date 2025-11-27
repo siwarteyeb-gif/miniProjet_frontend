@@ -20,7 +20,7 @@ export class RechercheParNom implements OnInit{
     
   }
   ngOnInit(): void {
-  this.allParfums = this.parfumService.listeParfum();
+  //this.allParfums = this.parfumService.listeParfum();
   this.parfums = this.allParfums;
 }
   // rechercherParfs(){

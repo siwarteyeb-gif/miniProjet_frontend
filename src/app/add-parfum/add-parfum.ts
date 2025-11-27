@@ -4,6 +4,7 @@ import { ParfumService } from '../services/parfum.service';
 import { Router } from '@angular/router';
 import { Genre } from '../model/genre.model';
 import { Parfum } from '../model/parfum.model';
+import { GenreWrapper } from '../model/GenreWrapper.model';
 
 @Component({
   selector: 'app-add-parfum',
@@ -13,7 +14,8 @@ import { Parfum } from '../model/parfum.model';
 })
 export class AddParfum implements OnInit {
   parfumForm!: FormGroup;
-  genres!: Genre[];
+  genres: Genre[] = [];
+  newParfum = new Parfum();
   message = '';
   err = '';
   loading = false;
@@ -24,45 +26,65 @@ export class AddParfum implements OnInit {
     private router: Router
   ) {}
 
+  
   ngOnInit(): void {
-    this.genres = this.parfumService.listeGenres();
-
+   
     this.parfumForm = this.fb.group({
       idParfum: ['', Validators.required],
       marqueParfum: ['', [Validators.required, Validators.minLength(5)]],
       nomParfum: ['', [Validators.required, Validators.minLength(5)]],
-      prixParfum: ['', [Validators.required,Validators.min(0)]],
+      prixParfum: ['', [Validators.required, Validators.min(1)]],
       contenanceParfum: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      idGen: ['', Validators.required],
+      idGen: ['', Validators.required]
     });
+
+    this.parfumService.listeGenres()
+      .subscribe({
+        next: (wrapper: GenreWrapper) => {
+          this.genres = wrapper._embedded.genres;
+          console.log(this.genres);
+        },
+        error: err => console.error(err)
+      });
   }
 
   addParfum() {
-    if (this.parfumForm.invalid) {
-      this.err = '⚠️ Veuillez remplir tous les champs correctement.';
-      this.parfumForm.markAllAsTouched();
+    if (this.parfumForm.invalid) return;
+
+    const selectedIdGen = this.parfumForm.value.idGen;
+
+    const selectedGenre = this.genres.find(gen => gen.idGen == selectedIdGen);
+    if (!selectedGenre) {
+      this.err = "Veuillez sélectionner un genre valide";
       return;
     }
 
-    this.loading = true;
-
-    const newParfum: Parfum = {
+    this.newParfum = {
       idParfum: this.parfumForm.value.idParfum,
       marqueParfum: this.parfumForm.value.marqueParfum,
       nomParfum: this.parfumForm.value.nomParfum,
       prixParfum: this.parfumForm.value.prixParfum,
       contenanceParfum: this.parfumForm.value.contenanceParfum,
-      genre: this.parfumService.consulterGenre(this.parfumForm.value.idGen),
-      email: this.parfumForm.value.email
+      email: this.parfumForm.value.email,
+      genre: selectedGenre
     };
 
-    this.parfumService.ajouterParfum(newParfum);
-    this.message = `✅ Parfum "${newParfum.nomParfum}" ajouté avec succès !`;
+    this.loading = true;
 
-    setTimeout(() => {
-      this.loading = false;
-      this.router.navigate(['parfums']);
-    }, 1000);
+    this.parfumService.ajouterParfum(this.newParfum)
+      .subscribe({
+        next: prod => {
+          console.log(prod);
+          this.message = "Parfum ajouté avec succès !";
+          this.loading = false;
+          this.router.navigate(['parfums']);
+        },
+        error: err => {
+          console.error(err);
+          this.err = "Erreur lors de l'ajout du parfum";
+          this.loading = false;
+        }
+      });
   }
 }

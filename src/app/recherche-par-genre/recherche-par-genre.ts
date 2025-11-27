@@ -20,10 +20,15 @@ export class RechercheParGenre implements OnInit{
   constructor(private parfumService:ParfumService){}
    
   
-  ngOnInit(): void {
-    this.genres=this.parfumService.listeGenres();       
-    this.parfums=[];
+ ngOnInit(): void {
+  this.parfumService.listeGenres()
+    .subscribe(gens =>
+       {this.genres = gens._embedded.genres; console.log(gens); });
+       this.parfums = [];
   }
+
+  
+
   onChange() {
     console.log(this.IdGenre);
     this.parfums=this.parfumService.rechercherParGenre(this.IdGenre);
@@ -32,7 +37,7 @@ export class RechercheParGenre implements OnInit{
   supprimerParfum(parf:Parfum){
   let conf=confirm("Etes-vous sur?");
   if(conf){
-  this.parfumService.supprimerParfum(parf);
+  this.parfumService.supprimerParfum(parf.idParfum!);
   this.parfums=this.parfumService.rechercherParGenre(this.IdGenre);
 }
 }
